@@ -1,0 +1,36 @@
+#Keyboard {
+  margin: 3px !important; }
+
+code {
+  background-color: #ECECEC;
+  color: #333;
+  padding: 1px; }
+
+#Loading {
+  font-family: monospace;
+  z-index: 100000;
+  position: absolute;
+  background-color: rgba(140, 140, 140, 0.5);
+  width: 100%;
+  height: calc(100% - 37.5px);
+  top: 37.5px;
+  left: 0px;
+  opacity: 1;
+  -webkit-transition: opacity 0.4s;
+          transition: opacity 0.4s; }
+  #Loading #Text {
+    color: white;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    margin-left: -150px;
+    height: 60px;
+    margin-top: -30px;
+    line-height: 60px;
+    font-size: 42px; }
+
+#Loading.Loaded {
+  pointer-events: none;
+  opacity: 0; }
