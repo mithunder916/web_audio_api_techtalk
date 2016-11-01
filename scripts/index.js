@@ -74,6 +74,7 @@ function keyReleaser(keyName){
 }
 
 var source;
+
 function getData() {
   source = audioCtx.createBufferSource();
   var request = new XMLHttpRequest();
