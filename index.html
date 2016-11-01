@@ -4,21 +4,16 @@
     <meta charset="utf-8">
     <title>Web Audio API Demo</title>
     <link rel="stylesheet" type="text/css" href="./style/piano2.css">
+    <link rel="stylesheet" type="text/css" href="./style/piano.css">
   </head>
   <body>
     <button type="button" name="button" id='alpha'>Raise Pitch!</button>
     <button type="button" name="button" id='beta'>Lower Pitch!</button>
     <button type="button" name="button" id='filter'>Filter</button>
-    <button type="button" name="button" id='play'>Play!</button>
+    <button type="button" name="button" id='play'>Play Sample!</button>
 
 
-
-    <div class="keyboard">
-      <div class="key">
-
-      </div>
-
-      <div id="p-wrapper">
+      <!-- <div id="p-wrapper">
   	<ul id="piano">
       <li><div class="anchor"></div><span></span></li>
   		<li><div class="anchor"></div><span></span></li>
@@ -26,7 +21,7 @@
   		<li><div class="anchor"></div></li>
   		<li><div class="anchor"></div><span></span></li>
   		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
+  		<li><div class="anchor"></div></li> -->
       <!--
   		<li><a href="#"></a><span></span><b>Home</b></li>
   		<li><a href="#"></a><span></span><b>About</b></li>
@@ -59,7 +54,7 @@
   			</div>
   		</li> -->
 
-  		<li><div class="anchor"></div><span></span></li>
+  		<!-- <li><div class="anchor"></div><span></span></li>
   		<li><div class="anchor"></div></li>
   		<li><div class="anchor"></div><span></span></li>
   		<li><div class="anchor"></div><span></span></li>
@@ -78,11 +73,25 @@
   		<li><div class="anchor"></div><span></span></li>
   		<li><div class="anchor"></div><span></span></li>
   		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
+  		<li><div class="anchor" id='lastkey'></div></li>
   	</ul>
-  </div>
+  </div> -->
 
-    </div>
+  <ul class="set">
+  <li class="white f" id='F'></li>
+  <li class="black fs"></li>
+  <li class="white g" id='G'></li>
+  <li class="black gs"></li>
+  <li class="white a" id='A'></li>
+  <li class="black as"></li>
+  <li class="white f" id='B'></li>
+  <li class="white e" id='C'></li>
+  	<li class="black ds"></li>
+	  <li class="white d" id='D'></li>
+	  <li class="black cs"></li>
+	  <li class="white c" id='E'></li>
+  </ul>
+
     <script type="text/javascript" src="./scripts/bufferLoader.js"></script>
     <script src="./scripts/index.js">
 

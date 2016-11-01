@@ -13,6 +13,19 @@
   list-style:none;
 }
 
+.pressed {
+  content:"";
+  width:0px;
+  height:0px;
+  border-width:216px 5px 0px;
+  border-style:solid;
+  border-color:transparent transparent transparent rgba(0,0,0,0.1);
+  position:absolute;
+  left:0px;
+  top:0px;
+  background-color: blue;
+}
+
 :focus {
   outline:none !important;
 }
@@ -113,6 +126,7 @@ ul#piano li a:active:before,ul#piano li div.anchor:active:before {
   position:absolute;
   left:0px;
   top:0px;
+  background-color: red;
 }
 
 ul#piano li a:active:after,ul#piano li div.anchor:active:after {
@@ -207,6 +221,7 @@ ul#piano li b:after {
   position:absolute;
   top:100%;
   left:53px;
+  background-color: red;
   border-width:5px;
   border-style:solid;
   border-color:#111 transparent transparent transparent;
