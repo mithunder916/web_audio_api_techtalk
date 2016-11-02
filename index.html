@@ -7,75 +7,19 @@
     <link rel="stylesheet" type="text/css" href="./style/piano.css">
   </head>
   <body>
-    <button type="button" name="button" id='alpha'>Raise Pitch!</button>
-    <button type="button" name="button" id='beta'>Lower Pitch!</button>
+    <div class="waveforms">
+      <button type="button" name="button" id='sine'>Sine</button>
+      <button type="button" name="button" id='square'>Square</button>
+      <button type="button" name="button" id='triangle'>Triangle</button>
+      <button type="button" name="button" id='sawtooth'>Sawtooth</button>
+    </div>
+
+  <div class="filters">
     <button type="button" name="button" id='filter'>Filter</button>
+    <input id="frequency" type='range' min='50' max='4000' value='1500' />
+    <input id="q" type='range' min='1' max='12' value='1' />
+  </div>
     <button type="button" name="button" id='play'>Play Sample!</button>
-
-
-      <!-- <div id="p-wrapper">
-  	<ul id="piano">
-      <li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li> -->
-      <!--
-  		<li><a href="#"></a><span></span><b>Home</b></li>
-  		<li><a href="#"></a><span></span><b>About</b></li>
-  		<li><a href="#"></a><span></span><b>Archives</b>
-  			<ul>
-  				<li><a href="#">2007</a></li>
-  				<li><a href="#">2006</a></li>
-  				<li><a href="#">2005</a></li>
-  				<li><a href="#">2004</a></li>
-  			</ul>
-  		</li>
-
-  		<li><a href="#"></a><b>Search</b>
-  			<div id="search">
-  				<form>
-  					<input type="text" placeholder="Search..." />
-  				</form>
-  			</div>
-  		</li>
-
-  		<li><a href="#"></a><span></span><b>Contact Me</b>
-  			<div id="contact">
-  				<form>
-  					<input type="text" class="required" placeholder="Name" />
-  					<input type="text" class="required" placeholder="Email" />
-  					<textarea class="required" placeholder="Your messages..."></textarea>
-  					<input type="submit" value="Send" />
-  					<div class="clear"></div>
-  				</form>
-  			</div>
-  		</li> -->
-
-  		<!-- <li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor"></div><span></span></li>
-  		<li><div class="anchor" id='lastkey'></div></li>
-  	</ul>
-  </div> -->
 
   <ul class="set">
   <li class="white f" id='F'></li>

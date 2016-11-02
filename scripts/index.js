@@ -22,17 +22,42 @@ function gainNodeCreator(num){
 var oscillators = oscillatorCreator(12);
 var gainNodes = gainNodeCreator(12);
 
-
-var oscillator = audioCtx.createOscillator();
-var oscillator2 = audioCtx.createOscillator();
-var gainNode = audioCtx.createGain();
+//EFFECTS
 var biquadFilter = audioCtx.createBiquadFilter();
+biquadFilter.type = "lowpass";
+biquadFilter.frequency.value = 1500;
+biquadFilter.Q.value = 1;
+// biquadFilter.gain.value = 2;
 
 oscillators.forEach(function (oscillator, index){
   oscillator.type = 'square';
   oscillator.frequency.value = noteSetter(index)
   oscillator.connect(gainNodes[index]);
 })
+
+// changes waveshape of all oscillators
+function changeWaveform(waveShape){
+  oscillators.forEach(osc =>
+    osc.type = waveShape)
+}
+
+// shifts pitch up or down 100 cents; fired variable is to make sure pitch can only be bent up once
+var fired;
+function pitchBend(direction){
+  if (!fired){
+    oscillators.forEach(osc => {
+      if (direction === 'up') osc.frequency.value += 100;
+      else if (direction === 'down') osc.frequency.value -= 100;
+    })
+  }
+}
+
+function pitchReset(direction){
+  oscillators.forEach(osc => {
+    if (direction === 'up') osc.frequency.value += 100;
+    else if (direction === 'down') osc.frequency.value -= 100;
+  }
+  )}
 
 //defines frequency values for each of the keys; starts from F4 and multiplies by 2^(1/12) as many times as the distance in semitones between that note and F
 function noteSetter(distanceFromF){
@@ -49,33 +74,50 @@ gainNodes.forEach(function (gainNode){
   gainNode.connect(audioCtx.destination);
 })
 
-// oscillator.type = 'square'; // sine wave — other values are 'square', 'sawtooth', 'triangle' and 'custom'
+biquadFilter.connect(audioCtx.destination);
 
-// connects signal chain to default output of audio context
-// oscillator.connect(biquadFilter);
-// gainNode.connect(audioCtx.destination);
+// event handler for buttons; could perhaps abstract this away by selecting a wave button class
+var sineButton = document.getElementById('sine')
+var squareButton = document.getElementById('square')
+var triangleButton = document.getElementById('triangle')
+var sawtoothButton = document.getElementById('sawtooth')
 
-biquadFilter.type = "lowshelf";
-biquadFilter.frequency.value = 1000;
-biquadFilter.gain.value = 25;
+sineButton.onclick = function () {changeWaveform('sine')}
+squareButton.onclick = function () {changeWaveform('square')}
+triangleButton.onclick = function () {
+  changeWaveform('triangle')}
+sawtoothButton.onclick = function () {
+  changeWaveform('sawtooth')}
 
-// event handler for button
-var button = document.getElementById('alpha')
-button.addEventListener('click', function (){
-  oscillator.frequency.value += 100
-})
+const filterEffect = document.getElementById('filter');
+const filterSlider = document.getElementById('frequency');
+const qSlider = document.getElementById('q');
 
-var button2 = document.getElementById('beta')
-button2.addEventListener('click', function (){
-  if (oscillator.frequency.value > 0) oscillator.frequency.value -= 100
-})
-
-const filterEffect = document.getElementById('filter')
+var filtered = false;
 filterEffect.addEventListener('click', function(){
-  // oscillator.connect(biquadFilter);
-  biquadFilter.frequency.value -= 100
+  if (!filtered){
+    gainNodes.forEach(function (gainNode){
+      gainNode.disconnect(audioCtx.destination)
+      gainNode.connect(biquadFilter);
+    })
+    filtered = true;
+  } else {
+    gainNodes.forEach(function (gainNode){
+      gainNode.disconnect(biquadFilter)
+      gainNode.connect(audioCtx.destination);
+    })
+    filtered = false;
+  }
+  console.log('FILTERED', biquadFilter.frequency.value, biquadFilter.Q.value)
 })
 
+filterSlider.onchange = function () {
+  biquadFilter.frequency.value = this.value
+}
+
+qSlider.onchange = function () {
+  biquadFilter.Q.value = this.value
+}
 // could make a helper function that just switches cases based on which key was pressed
 
 function naturalNotes(){
@@ -93,15 +135,12 @@ function accidentalNotes(){
 var theWhites = naturalNotes();
 var blackKeys = accidentalNotes();
 
-//event listeners
+//event listeners for key up and keydown
 document.addEventListener('keydown', (event) => {
-  const keyName = event.key;
-  // gainNode.gain.value = 0.7;
-  keySelector(keyName);
+  keySelector(event.key);
 })
 
 document.addEventListener('keyup', (event) => {
-  gainNode.gain.value = 0;
   keyReleaser(event.key);
 })
 
@@ -144,6 +183,12 @@ function keySelector(keyName){
               break;
     case 'j': keyPressDefiner('white', 6, 11);
               break;
+    case '[': pitchBend('up');
+              fired = true;
+              break;
+    case ']': pitchBend('down');
+              fired = true;
+              break;
     default: console.log(keyName)
   }
 }
@@ -160,17 +205,35 @@ function keyUpDefiner(color, keyIndex, gainIndex){
 function keyReleaser(keyName){
   switch (keyName){
     case 'a': keyUpDefiner('white', 0, 0);
+              break;
     case 'w': keyUpDefiner('black', 0, 1);
+              break;
     case 's': keyUpDefiner('white', 1, 2);
+              break;
     case 'e': keyUpDefiner('black', 1, 3);
+              break;
     case 'd': keyUpDefiner('white', 2, 4);
+              break;
     case 'r': keyUpDefiner('black', 2, 5);
+              break;
     case 'f': keyUpDefiner('white', 3, 6);
+              break;
     case 'g': keyUpDefiner('white', 4, 7);
+              break;
     case 'y': keyUpDefiner('black', 3, 8);
+              break;
     case 'h': keyUpDefiner('white', 5, 9);
-    case 'u': keyUpDefiner('black', 4, 10)
+              break;
+    case 'u': keyUpDefiner('black', 4, 10);
+              break;
     case 'j': keyUpDefiner('white', 6, 11);
+              break;
+    case '[': pitchReset('down');
+              fired = false;
+              break;
+    case ']': pitchReset('up');
+              fired = false;
+              break;
     default: console.log(keyName)
   }
 }
@@ -179,35 +242,35 @@ function keyReleaser(keyName){
 // get data retrieves an audio file from the samples folder and decodes it, saving that audio file to a new buffer source. Think of it as making a sample ready to play.
 var source;
 
-function getData() {
+function getData(sound) {
   source = audioCtx.createBufferSource();
+
   var request = new XMLHttpRequest();
-
-  request.open('GET', './samples/snare.wav', true);
-
+  request.open('GET', `./samples/${sound}.wav`, true);
   request.responseType = 'arraybuffer';
-
-
   request.onload = function() {
     var audioData = request.response;
-
     audioCtx.decodeAudioData(audioData, function(buffer) {
-        source.buffer = buffer;
-
-        source.connect(audioCtx.destination);
-        source.loop = true;
+      // separate these functions? need a way to trigger multiple tracks
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.loop = true;
       },
-
       function(e){"Error with decoding audio data" + e.err});
-
   }
-
   request.send();
+}
+
+function playSound(buffer) {
+  var source = context.createBufferSource();
+  source.buffer = buffer;
+  source.connect(audioCtx.destination);
+  source.start(0);
 }
 
 var play = document.getElementById('play')
   play.onclick = function() {
-  getData();
+  getData('kick');
   source.start(0);
   play.setAttribute('disabled', 'disabled');
 }
