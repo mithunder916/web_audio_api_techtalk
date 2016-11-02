@@ -30,25 +30,29 @@ var biquadFilter = audioCtx.createBiquadFilter();
 
 oscillators.forEach(function (oscillator, index){
   oscillator.type = 'square';
-  oscillator.frequency.value = 130.81;
+  oscillator.frequency.value = noteSetter(index)
   oscillator.connect(gainNodes[index]);
 })
+
+//defines frequency values for each of the keys; starts from F4 and multiplies by 2^(1/12) as many times as the distance in semitones between that note and F
+function noteSetter(distanceFromF){
+  var semiToneRatio = Math.pow(2,1/12);
+  var fourthF = 349.23;
+  while (distanceFromF > 0){
+    fourthF *= semiToneRatio
+    distanceFromF--;
+  }
+  return fourthF;
+}
 
 gainNodes.forEach(function (gainNode){
   gainNode.connect(audioCtx.destination);
 })
 
 // oscillator.type = 'square'; // sine wave — other values are 'square', 'sawtooth', 'triangle' and 'custom'
-// oscillator2.type = 'sawtooth'
-// oscillator.frequency.value = 130.81; // C3
-// oscillator2.frequency.value = 196.00 // E3
-// oscillator.start(4);
-// oscillator2.start(2);
 
 // connects signal chain to default output of audio context
 // oscillator.connect(biquadFilter);
-// oscillator.connect(gainNode);
-// oscillator2.connect(gainNode);
 // gainNode.connect(audioCtx.destination);
 
 biquadFilter.type = "lowshelf";
@@ -74,19 +78,22 @@ filterEffect.addEventListener('click', function(){
 
 // could make a helper function that just switches cases based on which key was pressed
 
-function whiteNotes(){
+function naturalNotes(){
   var whiteNoteArray = ['F','G','A','B','C','D','E'];
   return whiteNoteArray.map((note) =>
     document.getElementById(note))
 }
 
-var theWhites = whiteNotes();
-console.log(theWhites)
+function accidentalNotes(){
+  var blackNoteArray = ['F#','G#','A#','C#','D#'];
+  return blackNoteArray.map((note) =>
+    document.getElementById(note))
+}
 
-var fKey = document.getElementById('F')
-var gKey = document.getElementById('G')
-var aKey = document.getElementById('A')
+var theWhites = naturalNotes();
+var blackKeys = accidentalNotes();
 
+//event listeners
 document.addEventListener('keydown', (event) => {
   const keyName = event.key;
   // gainNode.gain.value = 0.7;
@@ -98,37 +105,72 @@ document.addEventListener('keyup', (event) => {
   keyReleaser(event.key);
 })
 
+function keyPressDefiner(color, keyIndex, gainIndex){
+  if (color === 'white') {
+    theWhites[keyIndex].style.backgroundColor = 'blue';
+  } else {
+    blackKeys[keyIndex].style.border = '4px solid #000';
+  }
+  gainNodes[gainIndex].gain.value = 0.7;
+}
+
 // key helper functions
 function keySelector(keyName){
   switch (keyName){
-    case 'n': oscillators[0].start();
-              oscillators[1].start();
+    case 'n': oscillators.forEach((osc) => osc.start())
               gainNodes.forEach((node) => node.gain.value = 0)
-              whiteNotes()
               break;
-    case 'k': button.click()
-    case 'a': theWhites[0].style.backgroundColor = 'blue'
-              gainNodes[0].gain.value = 0.7;
-              oscillators[0].frequency.value = 349.23;
+    case 'a': keyPressDefiner('white', 0, 0)
               break;
-    case 's': theWhites[1].style.backgroundColor = 'blue'
-              oscillators[0].frequency.value = 392;
+    case 'w': keyPressDefiner('black', 0, 1)
               break;
-    case 'd': theWhites[2].style.backgroundColor = 'blue'
-              gainNodes[1].gain.value = 0.7;
-              oscillators[1].frequency.value = 440;
+    case 's': keyPressDefiner('white', 1, 2)
               break;
-    case 'f':
-    case 'g':
+    case 'e': keyPressDefiner('black', 1, 3)
+              break;
+    case 'd': keyPressDefiner('white', 2, 4);
+              break;
+    case 'r': keyPressDefiner('black', 2, 5)
+              break;
+    case 'f': keyPressDefiner('white', 3, 6);
+              break;
+    case 'g': keyPressDefiner('white', 4, 7);
+              break;
+    case 'y': keyPressDefiner('black', 3, 8)
+              break;
+    case 'h': keyPressDefiner('white', 5, 9);
+              break;
+    case 'u': keyPressDefiner('black', 4, 10)
+              break;
+    case 'j': keyPressDefiner('white', 6, 11);
+              break;
     default: console.log(keyName)
   }
 }
 
+function keyUpDefiner(color, keyIndex, gainIndex){
+  if (color === 'white') {
+    theWhites[keyIndex].style.backgroundColor = '';
+  } else {
+    blackKeys[keyIndex].style.border = '1px solid #000';
+  }
+  gainNodes[gainIndex].gain.value = 0;
+}
+
 function keyReleaser(keyName){
   switch (keyName){
-    case 'a': theWhites[0].style.backgroundColor = '';
-    case 's': theWhites[1].style.backgroundColor = '';
-    case 'd': theWhites[2].style.backgroundColor = '';
+    case 'a': keyUpDefiner('white', 0, 0);
+    case 'w': keyUpDefiner('black', 0, 1);
+    case 's': keyUpDefiner('white', 1, 2);
+    case 'e': keyUpDefiner('black', 1, 3);
+    case 'd': keyUpDefiner('white', 2, 4);
+    case 'r': keyUpDefiner('black', 2, 5);
+    case 'f': keyUpDefiner('white', 3, 6);
+    case 'g': keyUpDefiner('white', 4, 7);
+    case 'y': keyUpDefiner('black', 3, 8);
+    case 'h': keyUpDefiner('white', 5, 9);
+    case 'u': keyUpDefiner('black', 4, 10)
+    case 'j': keyUpDefiner('white', 6, 11);
     default: console.log(keyName)
   }
 }
