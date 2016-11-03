@@ -15,6 +15,9 @@ button {
 	font-size: 1em;
 }
 
+#myCanvas2{
+	float: right;
+}
 ul .white {
 	height:16em; width:4em; z-index:1;
 	border-left:1px solid #bbb;

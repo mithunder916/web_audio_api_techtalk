@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="./style/piano.css">
   </head>
   <body>
-    <div class="waveforms">
+    <!-- <div class="waveforms">
       <button type="button" name="button" id='sine'>Sine</button>
       <button type="button" name="button" id='square'>Square</button>
       <button type="button" name="button" id='triangle'>Triangle</button>
@@ -28,7 +28,7 @@
     </div>
     <div class="wavegraph">
      <canvas id="myCanvas2" width="400" height="200" style="border:1px solid #000000;"></canvas>
-    </div>
+    </div> -->
 
   <ul class="set">
   <li class="white f" id='F'></li>
@@ -44,6 +44,28 @@
 	  <li class="black cs" id='D#'></li>
 	  <li class="white c" id='E'></li>
   </ul>
+
+  <div class="waveforms">
+    <button type="button" name="button" id='sine'>Sine</button>
+    <button type="button" name="button" id='square'>Square</button>
+    <button type="button" name="button" id='triangle'>Triangle</button>
+    <button type="button" name="button" id='sawtooth'>Sawtooth</button>
+  </div>
+
+<div class="filters">
+  <button type="button" name="button" id='filter'>Filter</button>
+  <input id="frequency" type='range' min='50' max='4000' value='1500' />
+  <input id="q" type='range' min='1' max='12' value='1' />
+</div>
+  <button type="button" name="button" id='play'>Drop a Sick Beat!</button>
+  <button type="button" name="button" id='stop'>Stop Drumming!</button>
+
+
+  <div class="redbar">
+    <canvas id="myCanvas" width="600" height="200" style="border:1px solid #000000;"></canvas>
+
+   <canvas id="myCanvas2" width="600" height="200" style="border:1px solid #000000;"></canvas>
+  </div>
 
     <script type="text/javascript" src="./scripts/bufferLoader.js"></script>
     <script src="./scripts/index.js">
