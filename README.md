@@ -1,6 +1,7 @@
 #web_audio_api_techtalk
 
 INSTRUCTIONS:
+
 1. Press the N button once to turn the synth 'on' (technically starts all 12 oscillators).
 
 2. Keys A, S, D, F, G, H and J play the white keys. W, E, T, Y and U play the black keys.
@@ -11,8 +12,7 @@ INSTRUCTIONS:
 
    The first slider modulates the cutoff frequency between 50 and 4000Hz.
    
-   The second slider modulates the resonance/Q between 1 and 15 (careful making it too high, especially while the cutoff      
-   frequency is also high).
+   The second slider modulates the resonance/Q between 1 and 15.
    
 5. To load a different wav. file to loop, add it to the /samples folder and change line 343 of index.js to the stringifed name of that file (excluding .wav).
 
