@@ -1,8 +1,8 @@
-
+//SIGNAL CHAIN: 12 OSC -> 12 GAIN NODES -> FILTER -> ANALYSER -> DESTINATION
 // creates audio context, within which all audio is defined and configured
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// creates a sound source and gain to node to control volume
+// helper functions that create arrays of oscillators and gain nodes, one for each piano key
 function oscillatorCreator(num){
   let oscArray = [];
   for (var i = 0; i<num; i++){
@@ -23,21 +23,18 @@ var oscillators = oscillatorCreator(12);
 var gainNodes = gainNodeCreator(12);
 
 var analyser = audioCtx.createAnalyser();
-// analyser.fftSize = 2048;
 analyser.smoothingTimeConstant = 0.8
 var waveAnalyser = audioCtx.createAnalyser();
 
-//EFFECTS
+// Low pass filter
 var biquadFilter = audioCtx.createBiquadFilter();
 biquadFilter.type = "lowpass";
 biquadFilter.frequency.value = 1500;
 biquadFilter.Q.value = 1;
-// biquadFilter.gain.value = 2;
 
 oscillators.forEach(function (oscillator, index){
-  oscillator.type = 'square';
+  oscillator.type = 'triangle';
   oscillator.frequency.value = noteSetter(index)
-  // oscillator.connect(analyser)
   oscillator.connect(gainNodes[index]);
 })
 
@@ -68,9 +65,10 @@ function pitchReset(direction){
   }
   )}
 
-//defines frequency values for each of the keys; starts from F4 and multiplies by 2^(1/12) as many times as the distance in semitones between that note and F
+// helper function for defining note frequency values
+// defines frequency values for each of the keys; starts from F4 and multiplies by 2^(1/12) as many times as the distance in semitones between that note and F
 function noteSetter(distanceFromF){
-  var semiToneRatio = Math.pow(2,1/12);
+  const semiToneRatio = Math.pow(2,1/12);
   var fourthF = 349.23;
   while (distanceFromF > 0){
     fourthF *= semiToneRatio
@@ -79,10 +77,10 @@ function noteSetter(distanceFromF){
   return fourthF;
 }
 
+// gain nodes are not connected to filter by default; pressing filter button will connect source to both filter and analyser
 gainNodes.forEach(function (gainNode){
   gainNode.connect(audioCtx.destination);
 })
-
 biquadFilter.connect(audioCtx.destination);
 
 // event handler for buttons; could perhaps abstract this away by selecting a wave button class
@@ -119,19 +117,16 @@ filterEffect.addEventListener('click', function(){
     })
     filtered = false;
   }
-  // console.log('FILTERED', biquadFilter.frequency.value, biquadFilter.Q.value)
 })
 
 //sets biquadFilter parameters to value of html range sliders
 filterSlider.onchange = function () {
   biquadFilter.frequency.value = this.value;
-  // draw()
 }
 
 qSlider.onchange = function () {
   biquadFilter.Q.value = this.value
 }
-// could make a helper function that just switches cases based on which key was pressed
 
 function naturalNotes(){
   var whiteNoteArray = ['F','G','A','B','C','D','E'];
@@ -145,7 +140,7 @@ function accidentalNotes(){
     document.getElementById(note))
 }
 
-var theWhites = naturalNotes();
+var whiteKeys = naturalNotes();
 var blackKeys = accidentalNotes();
 
 //event listeners for key up and keydown
@@ -160,7 +155,7 @@ document.addEventListener('keyup', (event) => {
 // when a key is pressed, animates keyboard and turns up its gain node
 function keyPressDefiner(color, keyIndex, gainIndex){
   if (color === 'white') {
-    theWhites[keyIndex].style.backgroundColor = 'blue';
+    whiteKeys[keyIndex].style.backgroundColor = 'blue';
   } else {
     blackKeys[keyIndex].style.border = '4px solid #000';
   }
@@ -209,7 +204,7 @@ function keySelector(keyName){
 
 function keyUpDefiner(color, keyIndex, gainIndex){
   if (color === 'white') {
-    theWhites[keyIndex].style.backgroundColor = '';
+    whiteKeys[keyIndex].style.backgroundColor = '';
   } else {
     blackKeys[keyIndex].style.border = '1px solid #000';
   }
@@ -253,14 +248,12 @@ function keyReleaser(keyName){
 }
 
 // AUDIO ANALYSER
-
 var canvas = document.getElementById('myCanvas');
 var canvasCtx = canvas.getContext("2d")
 var WIDTH = canvas.width;
 var HEIGHT = canvas.height;
 
-
-// red bar visualizer
+// red bar frequency visualizer; x-axis is frequency, y-axis is amplitude(intensity)
 
 analyser.fftSize = 256;
 
@@ -273,22 +266,19 @@ function draw() {
   canvasCtx.fillStyle = 'rgb(0, 0, 0)';
   canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-var barWidth = (WIDTH / bufferLength) * 2.5;
-  var barHeight;
-  var x = 0;
+  var barWidth = (WIDTH / bufferLength) * 2.5;
+    var barHeight;
+    var x = 0;
 
-for(var i = 0; i < bufferLength; i++) {
-        barHeight = dataArray[i];
-
-        canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
-        canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
-
-        x += barWidth + 1;
-      }
+  for(var i = 0; i < bufferLength; i++) {
+    barHeight = dataArray[i];
+    canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+    canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+    x += barWidth + 1;
+  }
 };
 
-// waveform visualizer
-
+// waveform visualizer; x-axis is time, y-axis is amplitude
 waveAnalyser.fftSize = 2048;
 
 var canvas2 = document.getElementById('myCanvas2');
@@ -321,12 +311,13 @@ function draw2() {
   canvasCtx2.lineTo(canvas2.width, canvas2.height/2);
   canvasCtx2.stroke();
 };
-
 draw2();
 
-
+// DRUM SAMPLE LOADER
 // get data retrieves an audio file from the samples folder and decodes it, saving that audio file to a new buffer source. Think of it as making a sample ready to play.
 var source;
+var drumGain = audioCtx.createGain();
+drumGain.gain.value = 3;
 
 function getData(sound) {
   source = audioCtx.createBufferSource();
@@ -337,9 +328,9 @@ function getData(sound) {
   request.onload = function() {
     var audioData = request.response;
     audioCtx.decodeAudioData(audioData, function(buffer) {
-      // separate these functions? need a way to trigger multiple tracks
       source.buffer = buffer;
-      source.connect(audioCtx.destination);
+      source.connect(drumGain)
+      drumGain.connect(audioCtx.destination);
       source.loop = true;
       },
       function(e){"Error with decoding audio data" + e.err});
@@ -347,45 +338,14 @@ function getData(sound) {
   request.send();
 }
 
-function playSound(buffer) {
-  var source = context.createBufferSource();
-  source.buffer = buffer;
-  source.connect(audioCtx.destination);
-  source.start(0);
-}
-
 var play = document.getElementById('play')
   play.onclick = function() {
-  getData('kick');
+  getData('drumloop');
   source.start(0);
   play.setAttribute('disabled', 'disabled');
 }
-// var bufferLoader = new BufferLoader(
-//         audioCtx,
-//         [
-//         "samples/kick.wav",
-//         "samples/snare.wav",
-//         "samples/hihat.wav",
-//         ],
-//         finishedLoading
-//     );
-//
-// function finishedLoading(bufferList) {
-//     // Create three sources and buffers
-//     var kick = context.createBufferSource();
-//     var snare = context.createBufferSource();
-//     var hihat = context.createBufferSource();
-//     kick.buffer = bufferList[0];
-//     snare.buffer = bufferList[1];
-//     hihat.buffer = bufferList[2];
-//
-//     kick.connect(context.destination);
-//     snare.connect(context.destination);
-//     hihat.connect(context.destination);
-// 	// Play them together
-//     kick.start(0);
-//     snare.start(0);
-//     hihat.start(0);
-// }
-//
-// bufferLoader.load()
+
+var stop = document.getElementById('stop')
+  stop.onclick = function(){
+    source.stop(0);
+  }

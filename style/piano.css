@@ -9,6 +9,12 @@ ul {
 box-shadow:0 0 50px rgba(0,0,0,0.5) inset, 0 1px rgba(212,152,125,0.2) inset,0 5px 15px rgba(0,0,0,0.5); }
 li { margin:0; padding:0; list-style:none; position:relative; float:left; }
 
+button {
+	height: 45px;
+	width: 120px;
+	font-size: 1em;
+}
+
 ul .white {
 	height:16em; width:4em; z-index:1;
 	border-left:1px solid #bbb;
