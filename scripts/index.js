@@ -23,14 +23,9 @@ var oscillators = oscillatorCreator(12);
 var gainNodes = gainNodeCreator(12);
 
 var analyser = audioCtx.createAnalyser();
-analyser.fftSize = 2048;
+// analyser.fftSize = 2048;
 analyser.smoothingTimeConstant = 0.8
-var bufferLength = analyser.frequencyBinCount; // equal to half of fftSize
-var dataArray = new Uint8Array(bufferLength); // creates an array of unsigned 8 bit integers, with a length of 1024
-
-// var fFrequencyData = new Float32Array(analyser.frequencyBinCount);
-// analyser.getFloatFrequencyData(fFrequencyData);
-// analyser.getByteTimeDomainData(dataArray); // passes time-domain data from the current sound waveform, and passes it into array of 8bit binary
+var waveAnalyser = audioCtx.createAnalyser();
 
 //EFFECTS
 var biquadFilter = audioCtx.createBiquadFilter();
@@ -46,7 +41,8 @@ oscillators.forEach(function (oscillator, index){
   oscillator.connect(gainNodes[index]);
 })
 
-biquadFilter.connect(analyser)
+biquadFilter.connect(analyser);
+biquadFilter.connect(waveAnalyser);
 
 // changes waveshape of all oscillators
 function changeWaveform(waveShape){
@@ -266,30 +262,67 @@ var HEIGHT = canvas.height;
 
 // red bar visualizer
 
-// analyser.fftSize = 256;
-//
-// function draw() {
-//   var bufferLength = analyser.frequencyBinCount;
-//   var dataArray = new Uint8Array(bufferLength);
-//   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
-//   drawVisual = window.requestAnimationFrame(draw);
-//   analyser.getByteFrequencyData(dataArray);
-//   canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-//   canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
-//
-// var barWidth = (WIDTH / bufferLength) * 2.5;
-//   var barHeight;
-//   var x = 0;
-//
-// for(var i = 0; i < bufferLength; i++) {
-//         barHeight = dataArray[i];
-//
-//         canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
-//         canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
-//
-//         x += barWidth + 1;
-//       }
-// };
+analyser.fftSize = 256;
+
+function draw() {
+  var bufferLength = analyser.frequencyBinCount; // equal to half of fftSize
+  var dataArray = new Uint8Array(bufferLength); // creates an array of unsigned 8 bit integers, with a length of 1024
+  canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+  drawVisual = window.requestAnimationFrame(draw);
+  analyser.getByteFrequencyData(dataArray);
+  canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+  canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+var barWidth = (WIDTH / bufferLength) * 2.5;
+  var barHeight;
+  var x = 0;
+
+for(var i = 0; i < bufferLength; i++) {
+        barHeight = dataArray[i];
+
+        canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+        canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+
+        x += barWidth + 1;
+      }
+};
+
+// waveform visualizer
+
+waveAnalyser.fftSize = 2048;
+
+var canvas2 = document.getElementById('myCanvas2');
+var canvasCtx2 = canvas2.getContext("2d")
+var WIDTH2 = canvas2.width;
+var HEIGHT2 = canvas2.height;
+
+function draw2() {
+  drawVisual = requestAnimationFrame(draw2);
+  var bufferLength2 = waveAnalyser.frequencyBinCount;
+  var dataArray2 = new Uint8Array(bufferLength2);
+  waveAnalyser.getByteTimeDomainData(dataArray2);
+  canvasCtx2.fillStyle = 'rgb(200, 200, 200)';
+  canvasCtx2.fillRect(0, 0, WIDTH2, HEIGHT2);
+  canvasCtx2.lineWidth = 2;
+  canvasCtx2.strokeStyle = 'rgb(0, 0, 0)';
+  canvasCtx2.beginPath();
+  var sliceWidth = WIDTH2 * 1.0 / bufferLength2;
+  var x = 0;
+  for(var i = 0; i < bufferLength2; i++) {
+    var v = dataArray2[i] / 128.0;
+    var y = v * HEIGHT2/2;
+    if(i === 0) {
+      canvasCtx2.moveTo(x, y);
+    } else {
+      canvasCtx2.lineTo(x, y);
+    }
+    x += sliceWidth;
+  }
+  canvasCtx2.lineTo(canvas2.width, canvas2.height/2);
+  canvasCtx2.stroke();
+};
+
+draw2();
 
 
 // get data retrieves an audio file from the samples folder and decodes it, saving that audio file to a new buffer source. Think of it as making a sample ready to play.
