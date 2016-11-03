@@ -2,6 +2,8 @@
 
 INSTRUCTIONS:
 
+run npm start from the root directory
+
 1. Press the N button once to turn the synth 'on' (technically starts all 12 oscillators).
 
 2. Keys A, S, D, F, G, H and J play the white keys. W, E, T, Y and U play the black keys.
