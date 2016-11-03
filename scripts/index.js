@@ -22,6 +22,16 @@ function gainNodeCreator(num){
 var oscillators = oscillatorCreator(12);
 var gainNodes = gainNodeCreator(12);
 
+var analyser = audioCtx.createAnalyser();
+analyser.fftSize = 2048;
+analyser.smoothingTimeConstant = 0.8
+var bufferLength = analyser.frequencyBinCount; // equal to half of fftSize
+var dataArray = new Uint8Array(bufferLength); // creates an array of unsigned 8 bit integers, with a length of 1024
+
+// var fFrequencyData = new Float32Array(analyser.frequencyBinCount);
+// analyser.getFloatFrequencyData(fFrequencyData);
+// analyser.getByteTimeDomainData(dataArray); // passes time-domain data from the current sound waveform, and passes it into array of 8bit binary
+
 //EFFECTS
 var biquadFilter = audioCtx.createBiquadFilter();
 biquadFilter.type = "lowpass";
@@ -32,8 +42,11 @@ biquadFilter.Q.value = 1;
 oscillators.forEach(function (oscillator, index){
   oscillator.type = 'square';
   oscillator.frequency.value = noteSetter(index)
+  // oscillator.connect(analyser)
   oscillator.connect(gainNodes[index]);
 })
+
+biquadFilter.connect(analyser)
 
 // changes waveshape of all oscillators
 function changeWaveform(waveShape){
@@ -93,8 +106,10 @@ const filterEffect = document.getElementById('filter');
 const filterSlider = document.getElementById('frequency');
 const qSlider = document.getElementById('q');
 
+// button that turns on filter
 var filtered = false;
 filterEffect.addEventListener('click', function(){
+  draw()
   if (!filtered){
     gainNodes.forEach(function (gainNode){
       gainNode.disconnect(audioCtx.destination)
@@ -108,11 +123,13 @@ filterEffect.addEventListener('click', function(){
     })
     filtered = false;
   }
-  console.log('FILTERED', biquadFilter.frequency.value, biquadFilter.Q.value)
+  // console.log('FILTERED', biquadFilter.frequency.value, biquadFilter.Q.value)
 })
 
+//sets biquadFilter parameters to value of html range sliders
 filterSlider.onchange = function () {
-  biquadFilter.frequency.value = this.value
+  biquadFilter.frequency.value = this.value;
+  // draw()
 }
 
 qSlider.onchange = function () {
@@ -144,6 +161,7 @@ document.addEventListener('keyup', (event) => {
   keyReleaser(event.key);
 })
 
+// when a key is pressed, animates keyboard and turns up its gain node
 function keyPressDefiner(color, keyIndex, gainIndex){
   if (color === 'white') {
     theWhites[keyIndex].style.backgroundColor = 'blue';
@@ -237,6 +255,41 @@ function keyReleaser(keyName){
     default: console.log(keyName)
   }
 }
+
+// AUDIO ANALYSER
+
+var canvas = document.getElementById('myCanvas');
+var canvasCtx = canvas.getContext("2d")
+var WIDTH = canvas.width;
+var HEIGHT = canvas.height;
+
+
+// red bar visualizer
+
+// analyser.fftSize = 256;
+//
+// function draw() {
+//   var bufferLength = analyser.frequencyBinCount;
+//   var dataArray = new Uint8Array(bufferLength);
+//   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+//   drawVisual = window.requestAnimationFrame(draw);
+//   analyser.getByteFrequencyData(dataArray);
+//   canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+//   canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+//
+// var barWidth = (WIDTH / bufferLength) * 2.5;
+//   var barHeight;
+//   var x = 0;
+//
+// for(var i = 0; i < bufferLength; i++) {
+//         barHeight = dataArray[i];
+//
+//         canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+//         canvasCtx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight);
+//
+//         x += barWidth + 1;
+//       }
+// };
 
 
 // get data retrieves an audio file from the samples folder and decodes it, saving that audio file to a new buffer source. Think of it as making a sample ready to play.
